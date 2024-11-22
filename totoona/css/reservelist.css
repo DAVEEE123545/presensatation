@@ -1,0 +1,160 @@
+
+/* Main Dashboard Layout */
+.dashboard {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Side-by-side grid */
+gap: 20px; /* Space between cards */
+margin-top: 10px; /* Spacing above the cards */
+}
+
+/* Reservation Card Styling */
+.card {
+background-color: #ffffff;
+border-radius: 10px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+overflow: hidden;
+
+}
+
+
+ /* Image Styling */
+ .card img {
+    width: 100%; /* Make the image take the full width of the card */
+    height: 200px; /* Set a fixed height for the image */
+    object-fit: cover; /* Ensures the image covers the area without stretching */
+    object-position: center; /* Centers the image within the designated space */
+}
+/* Card Content Styling */
+.card-content {
+padding: 20px;
+color: #333;
+}
+
+.card-content h2 {
+margin: 0;
+font-size: 20px;
+color: #3aafa9; /* Primary color */
+}
+
+.card-content p {
+margin: 10px 0;
+font-size: 14px;
+color: #666;
+}
+
+/* Status Styling */
+.status {
+margin-top: 10px;
+padding: 5px 10px;
+border-radius: 5px;
+font-size: 14px;
+font-weight: bold;
+display: inline-block;
+}
+
+.status.approved {
+background-color: #28a745;
+color: white;
+}
+
+.status.pending {
+background-color: #ffc107;
+color: white;
+}
+
+.status.rejected {
+background-color: #dc3545;
+color: white;
+}
+
+/* Action Buttons */
+.actions {
+margin-top: 10px;
+display: flex;
+gap: 10px;
+}
+
+.approve-btn, .reject-btn, .edit-btn {
+padding: 7px 14px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 14px;
+}
+
+.approve-btn {
+background-color: #28a745;
+color: white;
+}
+
+.approve-btn:hover {
+background-color: #218838;
+}
+
+.reject-btn {
+background-color: #dc3545;
+color: white;
+}
+
+.reject-btn:hover {
+background-color: #c82333;
+}
+
+.edit-btn {
+background-color: #007bff;
+color: white;
+}
+
+.edit-btn:hover {
+background-color: #0056b3;
+}
+.delete-btn {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #dc3545; /* Red color for delete */
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+/* Scrollable Container */
+.scrollable-container {
+max-height: 600px;
+overflow-y: auto;
+}
+
+/* Mobile Mode */
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr; /* Stack cards on smaller screens */
+    }
+
+    .card {
+        margin-bottom: 20px; /* Add space between stacked cards */
+        padding: 15px; /* Add padding to cards for better spacing */
+    }
+
+    .card-content {
+        padding: 10px; /* Reduce padding for mobile view */
+    }
+
+    .actions {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px; /* Space between buttons */
+    }
+
+    .approve-btn, .reject-btn, .edit-btn, .delete-btn {
+        width: 100%; /* Make buttons take full width */
+        padding: 12px; /* Adjust padding for mobile */
+        font-size: 16px; /* Increase font size for better readability */
+    }
+
+    .status {
+        font-size: 14px; /* Adjust status font size for better readability */
+    }
+}

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barangay Facility Reservation Chatbot</title>
+    <style>
+       /* Styling for the chatbot icon */
+       #chatbot-icon {
+    position: fixed;
+    top: 610px; /* Adjust to top */
+    right: 34px;
+    width: 45px;
+    height: 45px;
+    background-color: #0078d7;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    font-size: 28px;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+}
+
+
+
+        /* Hover effect for the icon */
+        #chatbot-icon:hover {
+            background-color: #005fa3;
+            transform: scale(1.1); /* Slightly enlarge on hover */
+        }
+
+        #chatbot-container {
+    width: 320px;
+    height: 400px;
+    position: fixed;
+    top: 200px; /* Adjust to top */
+    right: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    overflow: hidden;
+    display: none; /* Initially hidden */
+    transform: scale(0.8); /* Initially smaller */
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+        /* Header styling */
+        #chatbot-header {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Chat messages styling */
+        #chatbot-messages {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            background-color: #f9f9f9;
+        }
+
+        /* Message bubbles */
+        .bot-message, .user-message {
+            max-width: 80%;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Question (user's message) on the right */
+        .user-message {
+            background-color: #e7f3ff;
+            color: #333;
+            text-align: right;
+            align-self: flex-end;
+        }
+
+        /* Answer (bot's message) on the left */
+        .bot-message {
+            background-color: #0078d7;
+            color: #fff;
+            text-align: left;
+            align-self: flex-start;
+        }
+
+        /* Input area styling */
+        #chatbot-input {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+        }
+
+        #chatbot-input textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            resize: none;
+            font-size: 14px;
+        }
+
+        #send-button {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px 15px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Scrollbar styling for chatbot messages */
+        #chatbot-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chatbot-messages::-webkit-scrollbar-thumb {
+            background-color: #0078d7;
+            border-radius: 4px;
+        }
+
+        #chatbot-messages::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Chatbot Icon -->
+     
+    <div id="chatbot-icon" onclick="toggleChatbot()">💬</div>
+
+    <!-- Chatbot Container -->
+    <div id="chatbot-container">
+        <div id="chatbot-header">Barangay Facility Reservation Chatbot</div>
+        <div id="chatbot-messages"></div>
+        <div id="chatbot-input">
+            <textarea id="user-input" placeholder="Ask about barangay facility reservations..." rows="2"></textarea>
+            <button id="send-button" onclick="handleUserMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Chatbot responses for each facility
+        const responses = {
+            greeting: "Hello! I’m here to assist with your barangay facility reservations. Feel free to ask about our facilities, reservation steps, policies, or other details.",
+            
+            availableFacilities: "Our barangay offers several facilities:\n\n" +
+                "1. **Conference Room**\n2. **Basketball Court**\n3. **Banquet Hall**\n4. **Gymnasium**\n5. **Community Hall**\n\n" +
+                "Ask about any facility’s availability, or how to reserve it!",
+                
+            // Availability status for each facility
+            conferenceRoomAvailability: "The **Conference Room** is available for meetings and seminars, generally weekdays and some weekends. To check specific dates or reserve, head to our reservation page.",
+            
+            basketballCourtAvailability: "The **Basketball Court** is open for sports events and practices. It’s busiest on weekends, so early booking is recommended. Availability details are on our reservation page.",
+            
+            banquetHallAvailability: "The **Banquet Hall** is popular for large events like weddings and conferences. It's available on a first-come, first-served basis, and early reservation is encouraged as it books up fast!",
+            
+            gymnasiumAvailability: "The **Gymnasium** is available for sports, fitness events, and community gatherings. It’s typically open weekdays and weekends but fills up quickly, so check our calendar to confirm.",
+            
+            communityHallAvailability: "The **Community Hall** is ideal for workshops or small gatherings. Generally available on weekdays with limited weekend slots. Reserve through the calendar page to secure your spot.",
+            
+            // Reservation process and policies
+            reservationProcess: "To reserve a facility:\n\n" +
+                "1. **Visit the Reservation Page**\n2. **Select Your Facility**\n3. **Choose Date & Time**\n4. **Add Any Special Requests**\n5. **Submit Your Request**\n\n" +
+                "Admin will review and confirm based on availability. You’ll receive a confirmation by email.",
+            
+            cancellationPolicy: "If you wish to cancel your reservation, please notify us at least 48 hours in advance. Cancellations made within 24 hours may be subject to a cancellation fee.",
+            
+            userFeedback: "We value your feedback! After your reservation, feel free to leave comments about the facility and the booking process. Your input helps us improve our services.",
+            
+            modifyReservation: "To modify your reservation, please visit the reservation page, select the facility, and choose a new date and time. If changes are required, our team will assist you directly.",
+            
+            hoursOfOperation: "Our facilities are available from Monday to Saturday, 8:00 AM to 9:00 PM. Closed on Sundays for maintenance.",
+            
+            paymentInfo: "Payments for reservations can be made directly at the barangay office or online through our official payment portal.",
+            
+            faq: "Frequently Asked Questions:\n\n1. How do I make a reservation?\n2. What is the cancellation policy?\n3. How can I modify my reservation?\n4. What are the operating hours of the facilities?",
+            
+            facilityEquipment: "Many of our facilities are equipped with audio-visual equipment, chairs, tables, and projectors. For more details, please specify the facility you're interested in.",
+            
+            bookingConfirmation: "Once your reservation is confirmed, you’ll receive a notification with all the booking details, including the facility, date, time, and any additional requests.",
+            
+            depositInfo: "For certain facilities, a deposit may be required to secure your reservation. You’ll be informed of the deposit amount during the booking process.",
+            
+            facilityRules: "Each facility has its own set of rules. Be sure to check the facility’s rules and regulations before booking to ensure a smooth experience.",
+            
+            eventTypes: "Our facilities cater to a wide range of events: meetings, seminars, sports, parties, weddings, workshops, and more. Let us know the type of event you're hosting for more tailored information.",
+            
+            publicHolidays: "Our facilities are closed on public holidays. Please check the holiday schedule before making a reservation to avoid conflicts.",
+            
+            groupBookings: "For large groups, we offer special packages and discounts. Please contact us for more details on group bookings.",
+            
+            venueAccessibility: "All of our venues are wheelchair accessible, and we can assist with additional accessibility requirements upon request.",
+            
+            cleaningServices: "Cleaning services are included with each booking, and facilities will be cleaned before and after each event.",
+            
+            noiseRestrictions: "Please be mindful of noise levels, especially in residential areas. Events causing excessive noise may be subject to fines or restrictions.",
+            
+            alcoholPolicy: "Alcohol is permitted in some of our facilities, but you must confirm this during the reservation process and follow local regulations.",
+            
+            bookingAssistance: "Need help with booking? Our team is here to assist you! Feel free to ask about available slots, prices, or any other queries you may have."
+        };
+
+        // Function to toggle the chatbot visibility with animation
+        function toggleChatbot() {
+            const container = document.getElementById('chatbot-container');
+            if (container.style.display === 'none' || container.style.display === '') {
+                container.style.display = 'flex';
+                setTimeout(() => {
+                    container.style.transform = 'scale(1)';
+                    container.style.opacity = '1';
+                }, 100); // Slight delay for smooth transition
+            } else {
+                container.style.transform = 'scale(0.8)';
+                container.style.opacity = '0';
+                setTimeout(() => {
+                    container.style.display = 'none';
+                }, 300); // Wait for animation to finish
+            }
+        }
+
+        // Function to handle user input and send a response
+        function handleUserMessage() {
+            const userInput = document.getElementById('user-input').value;
+            if (userInput.trim() === "") return;
+            
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('user-message');
+            userMessage.textContent = userInput;
+            document.getElementById('chatbot-messages').appendChild(userMessage);
+            
+            document.getElementById('user-input').value = '';
+
+            // Respond based on the user's message
+            let botResponse = "I'm sorry, I didn't understand that. Please try again.";
+            
+            const normalizedInput = userInput.toLowerCase();
+            if (normalizedInput.includes("hello") || normalizedInput.includes("hi")) {
+                botResponse = responses.greeting;
+            } else if (normalizedInput.includes("facility") || normalizedInput.includes("available")) {
+                botResponse = responses.availableFacilities;
+            } else if (normalizedInput.includes("conference room")) {
+                botResponse = responses.conferenceRoomAvailability;
+            } else if (normalizedInput.includes("basketball court")) {
+                botResponse = responses.basketballCourtAvailability;
+            } else if (normalizedInput.includes("banquet hall")) {
+                botResponse = responses.banquetHallAvailability;
+            } else if (normalizedInput.includes("gymnasium")) {
+                botResponse = responses.gymnasiumAvailability;
+            } else if (normalizedInput.includes("community hall")) {
+                botResponse = responses.communityHallAvailability;
+            } else if (normalizedInput.includes("reservation")) {
+                botResponse = responses.reservationProcess;
+            } else if (normalizedInput.includes("cancellation")) {
+                botResponse = responses.cancellationPolicy;
+            } else if (normalizedInput.includes("feedback")) {
+                botResponse = responses.userFeedback;
+            } else if (normalizedInput.includes("modify") || normalizedInput.includes("change")) {
+                botResponse = responses.modifyReservation;
+            } else if (normalizedInput.includes("hours")) {
+                botResponse = responses.hoursOfOperation;
+            } else if (normalizedInput.includes("payment")) {
+                botResponse = responses.paymentInfo;
+            } else if (normalizedInput.includes("faq")) {
+                botResponse = responses.faq;
+            } else if (normalizedInput.includes("equipment")) {
+                botResponse = responses.facilityEquipment;
+            } else if (normalizedInput.includes("confirmation")) {
+                botResponse = responses.bookingConfirmation;
+            } else if (normalizedInput.includes("deposit")) {
+                botResponse = responses.depositInfo;
+            } else if (normalizedInput.includes("rules")) {
+                botResponse = responses.facilityRules;
+            } else if (normalizedInput.includes("event")) {
+                botResponse = responses.eventTypes;
+            } else if (normalizedInput.includes("holiday")) {
+                botResponse = responses.publicHolidays;
+            } else if (normalizedInput.includes("group")) {
+                botResponse = responses.groupBookings;
+            } else if (normalizedInput.includes("accessibility")) {
+                botResponse = responses.venueAccessibility;
+            } else if (normalizedInput.includes("cleaning")) {
+                botResponse = responses.cleaningServices;
+            } else if (normalizedInput.includes("noise")) {
+                botResponse = responses.noiseRestrictions;
+            } else if (normalizedInput.includes("alcohol")) {
+                botResponse = responses.alcoholPolicy;
+            } else if (normalizedInput.includes("help")) {
+                botResponse = responses.bookingAssistance;
+            }
+
+            // Display bot response
+            const botMessage = document.createElement('div');
+            botMessage.classList.add('bot-message');
+            botMessage.textContent = botResponse;
+            document.getElementById('chatbot-messages').appendChild(botMessage);
+        }
+    </script>
+</body>
+</html>
